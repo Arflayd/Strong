@@ -34,29 +34,40 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         } else {
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                try {
-                    String token = authorizationHeader.substring("Bearer ".length());
-                    JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).build();
-                    DecodedJWT decodedJWT = verifier.verify(token);
-                    String username = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                    stream(roles).forEach(role -> {
-                        authorities.add(new SimpleGrantedAuthority(role));
-                    });
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    filterChain.doFilter(request, response);
-
-                } catch (Exception e) {
-                    log.error("Error logging in: {} ", e.getMessage());
-                    response.sendError(HttpStatus.FORBIDDEN.value());
-                }
+                filterOnBearerToken(request, response, filterChain);
             } else {
                 filterChain.doFilter(request, response);
             }
         }
     }
+
+    private void filterOnBearerToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
+        try {
+            String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer ".length());
+
+            UsernamePasswordAuthenticationToken authenticationToken = decodeToken(token);
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            filterChain.doFilter(request, response);
+
+        } catch (Exception e) {
+            log.error("Error logging in: {} ", e.getMessage());
+            response.sendError(HttpStatus.FORBIDDEN.value());
+        }
+    }
+
+    private UsernamePasswordAuthenticationToken decodeToken (String token) {
+
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).build();
+        DecodedJWT decodedJWT = verifier.verify(token);
+
+        String username = decodedJWT.getSubject();
+        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+
+        return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    }
+
 }
