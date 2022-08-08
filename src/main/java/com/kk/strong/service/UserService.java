@@ -4,6 +4,7 @@ import com.kk.strong.model.User;
 import com.kk.strong.model.UserRole;
 import com.kk.strong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -34,20 +36,25 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getUsers() {
+        log.info("Getting all users");
         return userRepository.findAll();
     }
 
     public User getUser(Long id) {
+        log.info("Getting user with id: {}", id);
         return userRepository.findById(id).get();
     }
 
     public User saveUser(User user) {
+        log.info("Saving user: {}", user.toString());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
     public User addRoleToUser(User user, UserRole userRole) {
+        log.info("Adding role: {} to user with id: {}", userRole.name(), user.getId());
         user.getRoles().add(userRole);
         return userRepository.save(user);
     }
+
 }
