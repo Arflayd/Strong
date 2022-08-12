@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
-public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class UsernamePasswordTokenAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
 

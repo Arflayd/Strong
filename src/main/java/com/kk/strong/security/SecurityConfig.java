@@ -39,8 +39,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager(authenticationConfiguration));
-        customAuthenticationFilter.setFilterProcessesUrl("/login");
+        UsernamePasswordTokenAuthenticationFilter usernamePasswordTokenAuthenticationFilter = new UsernamePasswordTokenAuthenticationFilter(authenticationManager(authenticationConfiguration));
+        usernamePasswordTokenAuthenticationFilter.setFilterProcessesUrl("/login");
 
         httpSecurity.csrf().disable();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -50,8 +50,8 @@ public class SecurityConfig {
 
         httpSecurity.authorizeRequests().anyRequest().authenticated();
 
-        httpSecurity.addFilter(customAuthenticationFilter);
-        httpSecurity.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilter(usernamePasswordTokenAuthenticationFilter);
+        httpSecurity.addFilterBefore(new TokenAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
