@@ -23,7 +23,7 @@ import java.util.Collection;
 import static java.util.Arrays.stream;
 
 @Slf4j
-public class CustomAuthorizationFilter extends OncePerRequestFilter {
+public class TokenAuthorizationFilter extends OncePerRequestFilter {
 
     private final String TOKEN_SECRET = "token_secret";
 
