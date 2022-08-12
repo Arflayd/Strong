@@ -16,13 +16,4 @@ public class StrongApplication {
     public static void main(String[] args) {
         SpringApplication.run(StrongApplication.class, args);
     }
-
-    @Bean
-    public CommandLineRunner commandLineRunner(UserService userService) {
-        return args -> {
-            userService.saveUser(new User(1L, "Adam", "adam", "adam", List.of(UserRole.REGULAR_USER)));
-            userService.saveUser(new User(2L, "Eve", "eve", "eve", List.of(UserRole.REGULAR_USER, UserRole.PREMIUM_USER)));
-        };
-    }
-
 }
