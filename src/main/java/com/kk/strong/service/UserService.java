@@ -1,7 +1,7 @@
 package com.kk.strong.service;
 
-import com.kk.strong.model.User;
-import com.kk.strong.model.UserRole;
+import com.kk.strong.exception.UserNotFoundException;
+import com.kk.strong.model.*;
 import com.kk.strong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +40,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public User getUser(Long id) {
-        log.info("Getting user with id: {}", id);
-        return userRepository.findById(id).get();
+    public User getUser(Long userId) {
+        log.info("Getting user with id: {}", userId);
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     public User saveUser(User user) {
@@ -57,4 +59,37 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public List<BodyReport> getBodyReportsForUser(Long userId) {
+        log.info("Getting body reports for user with id: {}", userId);
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId))
+                .getBodyReports();
+    }
+
+    public void saveBodyReportForUser(Long userId, BodyReport bodyReport) {
+        log.info("Saving body report for user with id: {}", userId);
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId))
+                .getBodyReports()
+                .add(bodyReport);
+    }
+
+    public List<WorkoutSession> getWorkoutSessionsForUser(Long userId) {
+        log.info("Getting workout sessions for user with id: {}", userId);
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId))
+                .getWorkoutSessions();
+    }
+
+    public void saveWorkoutSessionForUser(Long userId, WorkoutSession workoutSession) {
+        log.info("Saving workout session for user with id: {}", userId);
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId))
+                .getWorkoutSessions()
+                .add(workoutSession);
+    }
 }
