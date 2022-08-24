@@ -4,12 +4,15 @@ import com.kk.strong.model.BodyReport;
 import com.kk.strong.model.Exercise;
 import com.kk.strong.model.User;
 import com.kk.strong.model.WorkoutSession;
+import com.kk.strong.model.dto.UserDto;
 import com.kk.strong.service.UserService;
+import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.util.List;
 
@@ -20,20 +23,29 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping(path = "/users")
+    @PreAuthorize("")
+    public ResponseEntity<UserDto> registerUser(
+            @NotNull @PathParam("username") String username,
+            @NotNull @PathParam("password") String password,
+            @RequestBody UserDto userDto) {
+        return ResponseEntity.created(URI.create("/users")).body(userService.registerUser(username, password, userDto));
+    }
+
     @GetMapping(path = "/users")
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @GetMapping(path = "/users/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUser(id));
+    @GetMapping(path = "/users/{userId}")
+    public ResponseEntity<UserDto> getUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @PostMapping(path = "/users")
+    @PutMapping(path = "/users/{userId}")
     @PreAuthorize("hasAuthority('PREMIUM_USER')")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        return ResponseEntity.created(URI.create("/users")).body(userService.saveUser(user));
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        return ResponseEntity.created(URI.create("/users")).body(userService.updateUser(userId, userDto));
     }
 
     @GetMapping(path = "/users/{userId}/body_reports/")

@@ -2,9 +2,11 @@ package com.kk.strong.service;
 
 import com.kk.strong.exception.UserNotFoundException;
 import com.kk.strong.model.*;
+import com.kk.strong.model.dto.UserDto;
 import com.kk.strong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final ModelMapper modelMapper = new ModelMapper();
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -35,28 +40,39 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
-    public List<User> getUsers() {
-        log.info("Getting all users");
-        return userRepository.findAll();
+    public UserDto registerUser(String username, String password, UserDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
+        user.setUsername(username);
+        user.setPassword(password);
+        userRepository.save(user);
+        return userDto;
     }
 
-    public User getUser(Long userId) {
-        log.info("Getting user with id: {}", userId);
+    public List<UserDto> getUsers() {
+        log.info("Getting all users");
         return userRepository
+                .findAll()
+                .stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUser(Long userId) {
+        log.info("Getting user with id: {}", userId);
+        User user = userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    public UserDto addRoleToUser(Long userId, UserRole userRole) {
+        log.info("Adding role: {} to user with id: {}", userRole.name(), userId);
+        User user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-    }
-
-    public User saveUser(User user) {
-        log.info("Saving user: {}", user.toString());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public User addRoleToUser(User user, UserRole userRole) {
-        log.info("Adding role: {} to user with id: {}", userRole.name(), user.getId());
         user.getRoles().add(userRole);
-        return userRepository.save(user);
+        userRepository.save(user);
+        return modelMapper.map(user, UserDto.class);
     }
 
     public List<BodyReport> getBodyReportsForUser(Long userId) {
@@ -91,5 +107,15 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException(userId))
                 .getWorkoutSessions()
                 .add(workoutSession);
+    }
+
+    public UserDto updateUser(Long userId, UserDto userDto) {
+        log.info("Updating user with id: {}", userId);
+        User user = userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
+        modelMapper.map(userDto, user);
+        userRepository.save(user);
+        return userDto;
     }
 }
