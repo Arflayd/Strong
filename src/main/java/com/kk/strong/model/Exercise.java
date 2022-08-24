@@ -17,6 +17,9 @@ public class Exercise {
     @GeneratedValue
     private Long id;
 
+    @ManyToOne
+    private WorkoutSession workoutSession;
+
     @Enumerated(value = EnumType.STRING)
     private ExerciseType exerciseType;
 
