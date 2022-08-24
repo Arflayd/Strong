@@ -19,6 +19,10 @@ public class WorkoutSession {
     @Id
     @GeneratedValue
     private Long id;
+
+    @ManyToOne
+    private User user;
+
     private LocalDateTime timestamp;
 
     @Enumerated(value = EnumType.STRING)
