@@ -1,12 +1,9 @@
 package com.kk.strong.controller;
 
 import com.kk.strong.model.BodyReport;
-import com.kk.strong.model.Exercise;
-import com.kk.strong.model.User;
 import com.kk.strong.model.WorkoutSession;
 import com.kk.strong.model.dto.UserDto;
 import com.kk.strong.service.UserService;
-import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,10 +21,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(path = "/users")
-    @PreAuthorize("")
     public ResponseEntity<UserDto> registerUser(
-            @NotNull @PathParam("username") String username,
-            @NotNull @PathParam("password") String password,
+            @PathParam("username") String username,
+            @PathParam("password") String password,
             @RequestBody UserDto userDto) {
         return ResponseEntity.created(URI.create("/users")).body(userService.registerUser(username, password, userDto));
     }
@@ -48,7 +44,13 @@ public class UserController {
         return ResponseEntity.created(URI.create("/users")).body(userService.updateUser(userId, userDto));
     }
 
-    @GetMapping(path = "/users/{userId}/body_reports/")
+    @DeleteMapping(path = "/users/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(path = "/users/{userId}/body_reports")
     public ResponseEntity<List<BodyReport>> getBodyReportsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getBodyReportsForUser(userId));
     }
@@ -56,5 +58,17 @@ public class UserController {
     @GetMapping(path = "/users/{userId}/workout_sessions")
     public ResponseEntity<List<WorkoutSession>> getWorkoutSessionsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getWorkoutSessionsForUser(userId));
+    }
+
+    @PostMapping(path = "/users/{userId}/body_reports")
+    public ResponseEntity<BodyReport> addBodyReportForUser(@PathVariable Long userId, @RequestBody BodyReport bodyReport) {
+        return ResponseEntity.created(URI.create(String.format("/users/%s/body_reports", userId)))
+                .body(userService.addBodyReportForUser(userId, bodyReport));
+    }
+
+    @PostMapping(path = "/users/{userId}/workout_sessions")
+    public ResponseEntity<WorkoutSession> addWorkoutSessionForUser(@PathVariable Long userId, @RequestBody WorkoutSession workoutSession) {
+        return ResponseEntity.created(URI.create(String.format("/users/%s/workout_sessions", userId)))
+                .body(userService.addWorkoutSessionForUser(userId, workoutSession));
     }
 }

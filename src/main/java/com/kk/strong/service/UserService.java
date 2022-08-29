@@ -27,13 +27,14 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final BodyReportService bodyReportService;
     private final PasswordEncoder passwordEncoder;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.name())));
@@ -43,7 +44,8 @@ public class UserService implements UserDetailsService {
     public UserDto registerUser(String username, String password, UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
+        user.getRoles().add(UserRole.REGULAR_USER);
         userRepository.save(user);
         return userDto;
     }
@@ -83,13 +85,15 @@ public class UserService implements UserDetailsService {
                 .getBodyReports();
     }
 
-    public void saveBodyReportForUser(Long userId, BodyReport bodyReport) {
+    public BodyReport addBodyReportForUser(Long userId, BodyReport bodyReport) {
         log.info("Saving body report for user with id: {}", userId);
+        //bodyReportService.createBodyReport(bodyReport);
         userRepository
                 .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId))
                 .getBodyReports()
                 .add(bodyReport);
+        return bodyReport;
     }
 
     public List<WorkoutSession> getWorkoutSessionsForUser(Long userId) {
@@ -100,13 +104,14 @@ public class UserService implements UserDetailsService {
                 .getWorkoutSessions();
     }
 
-    public void saveWorkoutSessionForUser(Long userId, WorkoutSession workoutSession) {
+    public WorkoutSession addWorkoutSessionForUser(Long userId, WorkoutSession workoutSession) {
         log.info("Saving workout session for user with id: {}", userId);
         userRepository
                 .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId))
                 .getWorkoutSessions()
                 .add(workoutSession);
+        return workoutSession;
     }
 
     public UserDto updateUser(Long userId, UserDto userDto) {
@@ -117,5 +122,9 @@ public class UserService implements UserDetailsService {
         modelMapper.map(userDto, user);
         userRepository.save(user);
         return userDto;
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 }
