@@ -26,9 +26,9 @@ public class User {
     private int age;
     private int height;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<BodyReport> bodyReports = new ArrayList<>();
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<WorkoutSession> workoutSessions = new ArrayList<>();
 
     @ElementCollection
