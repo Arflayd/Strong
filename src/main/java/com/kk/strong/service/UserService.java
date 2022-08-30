@@ -1,8 +1,14 @@
 package com.kk.strong.service;
 
+import com.kk.strong.exception.BodyReportNotFoundException;
+import com.kk.strong.exception.ExerciseNotFoundException;
 import com.kk.strong.exception.UserNotFoundException;
+import com.kk.strong.exception.WorkoutSessionNotFoundException;
 import com.kk.strong.model.*;
+import com.kk.strong.model.dto.BodyReportDto;
 import com.kk.strong.model.dto.UserDto;
+import com.kk.strong.model.dto.WorkoutSessionDto;
+import com.kk.strong.repository.BodyReportRepository;
 import com.kk.strong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +34,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final BodyReportService bodyReportService;
+    private final WorkoutSessionService workoutSessionService;
     private final PasswordEncoder passwordEncoder;
 
     private final ModelMapper modelMapper = new ModelMapper();
@@ -67,51 +74,32 @@ public class UserService implements UserDetailsService {
         return modelMapper.map(user, UserDto.class);
     }
 
-    public UserDto addRoleToUser(Long userId, UserRole userRole) {
+    public void addRoleForUser(Long userId, UserRole userRole) {
         log.info("Adding role: {} to user with id: {}", userRole.name(), userId);
         User user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         user.getRoles().add(userRole);
-        userRepository.save(user);
-        return modelMapper.map(user, UserDto.class);
     }
 
-    public List<BodyReport> getBodyReportsForUser(Long userId) {
-        log.info("Getting body reports for user with id: {}", userId);
-        return userRepository
+    public BodyReportDto addBodyReportForUser(Long userId, BodyReportDto bodyReportDto) {
+        log.info("Adding body report for user with id: {}", userId);
+        BodyReport bodyReport = modelMapper.map(bodyReportDto, BodyReport.class);
+        User user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId))
-                .getBodyReports();
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        user.getBodyReports().add(bodyReport);
+        return bodyReportDto;
     }
 
-    public BodyReport addBodyReportForUser(Long userId, BodyReport bodyReport) {
-        log.info("Saving body report for user with id: {}", userId);
-        //bodyReportService.createBodyReport(bodyReport);
-        userRepository
+    public WorkoutSessionDto addWorkoutSessionForUser(Long userId, WorkoutSessionDto workoutSessionDto) {
+        log.info("Adding workout session for user with id: {}", userId);
+        WorkoutSession workoutSession = modelMapper.map(workoutSessionDto, WorkoutSession.class);
+        User user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId))
-                .getBodyReports()
-                .add(bodyReport);
-        return bodyReport;
-    }
-
-    public List<WorkoutSession> getWorkoutSessionsForUser(Long userId) {
-        log.info("Getting workout sessions for user with id: {}", userId);
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId))
-                .getWorkoutSessions();
-    }
-
-    public WorkoutSession addWorkoutSessionForUser(Long userId, WorkoutSession workoutSession) {
-        log.info("Saving workout session for user with id: {}", userId);
-        userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId))
-                .getWorkoutSessions()
-                .add(workoutSession);
-        return workoutSession;
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        user.getWorkoutSessions().add(workoutSession);
+        return workoutSessionDto;
     }
 
     public UserDto updateUser(Long userId, UserDto userDto) {
@@ -120,11 +108,46 @@ public class UserService implements UserDetailsService {
                         .findById(userId)
                         .orElseThrow(() -> new UserNotFoundException(userId));
         modelMapper.map(userDto, user);
-        userRepository.save(user);
         return userDto;
     }
 
     public void deleteUser(Long userId) {
+        log.info("Deleting user with id: {}", userId);
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        user.getBodyReports().forEach(bodyReport -> deleteBodyReportForUser(userId, bodyReport.getId()));
+        user.getWorkoutSessions().forEach(workoutSession -> deleteWorkoutSessionForUser(userId, workoutSession.getId()));
         userRepository.deleteById(userId);
+    }
+
+    public void deleteBodyReportForUser(Long userId, Long bodyReportId) {
+        log.info("Deleting body report with id: {}", bodyReportId);
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        BodyReport bodyReportToDelete = user
+                .getBodyReports()
+                .stream()
+                .filter(bodyReport -> bodyReport.getId().equals(bodyReportId))
+                .findFirst()
+                .orElseThrow(() -> new BodyReportNotFoundException(bodyReportId));
+        user.getBodyReports().remove(bodyReportToDelete);
+        bodyReportService.deleteBodyReport(bodyReportId);
+    }
+
+    public void deleteWorkoutSessionForUser(Long userId, Long workoutSessionId) {
+        log.info("Deleting workout session with id: {}", workoutSessionId);
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        WorkoutSession workoutSessionToDelete = user
+                .getWorkoutSessions()
+                .stream()
+                .filter(workoutSession -> workoutSession.getId().equals(workoutSessionId))
+                .findFirst()
+                .orElseThrow(() -> new WorkoutSessionNotFoundException(workoutSessionId));
+        user.getWorkoutSessions().remove(workoutSessionToDelete);
+        workoutSessionService.deleteWorkoutSession(workoutSessionId);
     }
 }
