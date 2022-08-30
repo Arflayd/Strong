@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 public class SecurityConfig {
 
-    protected static final int ACCESS_TOKEN_EXPIRY_SECONDS = 60 * 60;
+    protected static final int ACCESS_TOKEN_EXPIRY_SECONDS = 60 * 60 * 24;
     protected static final String TOKEN_SECRET = "token_secret";
 
     private final AuthenticationConfiguration authenticationConfiguration;
