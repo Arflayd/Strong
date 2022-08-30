@@ -2,7 +2,9 @@ package com.kk.strong.controller;
 
 import com.kk.strong.model.BodyReport;
 import com.kk.strong.model.WorkoutSession;
+import com.kk.strong.model.dto.BodyReportDto;
 import com.kk.strong.model.dto.UserDto;
+import com.kk.strong.model.dto.WorkoutSessionDto;
 import com.kk.strong.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('REGULAR_USER')")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(path = "/users")
+    @PostMapping
     public ResponseEntity<UserDto> registerUser(
             @PathParam("username") String username,
             @PathParam("password") String password,
@@ -28,47 +31,49 @@ public class UserController {
         return ResponseEntity.created(URI.create("/users")).body(userService.registerUser(username, password, userDto));
     }
 
-    @GetMapping(path = "/users")
+    @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @GetMapping(path = "/users/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @PutMapping(path = "/users/{userId}")
+    @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('PREMIUM_USER')")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
         return ResponseEntity.created(URI.create("/users")).body(userService.updateUser(userId, userDto));
     }
 
-    @DeleteMapping(path = "/users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(path = "/users/{userId}/body_reports")
-    public ResponseEntity<List<BodyReport>> getBodyReportsForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getBodyReportsForUser(userId));
-    }
-
-    @GetMapping(path = "/users/{userId}/workout_sessions")
-    public ResponseEntity<List<WorkoutSession>> getWorkoutSessionsForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getWorkoutSessionsForUser(userId));
-    }
-
-    @PostMapping(path = "/users/{userId}/body_reports")
-    public ResponseEntity<BodyReport> addBodyReportForUser(@PathVariable Long userId, @RequestBody BodyReport bodyReport) {
+    @PostMapping("/{userId}/body_reports")
+    public ResponseEntity<BodyReportDto> addBodyReportForUser(@PathVariable Long userId, @RequestBody BodyReportDto bodyReportDto) {
         return ResponseEntity.created(URI.create(String.format("/users/%s/body_reports", userId)))
-                .body(userService.addBodyReportForUser(userId, bodyReport));
+                .body(userService.addBodyReportForUser(userId, bodyReportDto));
     }
 
-    @PostMapping(path = "/users/{userId}/workout_sessions")
-    public ResponseEntity<WorkoutSession> addWorkoutSessionForUser(@PathVariable Long userId, @RequestBody WorkoutSession workoutSession) {
+    @DeleteMapping("/{userId}/body_reports/{bodyReportId}")
+    public ResponseEntity<?> deleteBodyReportForUser(@PathVariable Long userId, @PathVariable Long bodyReportId) {
+        userService.deleteBodyReportForUser(userId, bodyReportId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{userId}/workout_sessions")
+    public ResponseEntity<WorkoutSessionDto> addWorkoutSessionForUser(@PathVariable Long userId, @RequestBody WorkoutSessionDto workoutSessionDto) {
         return ResponseEntity.created(URI.create(String.format("/users/%s/workout_sessions", userId)))
-                .body(userService.addWorkoutSessionForUser(userId, workoutSession));
+                .body(userService.addWorkoutSessionForUser(userId, workoutSessionDto));
+    }
+
+    @DeleteMapping("/{userId}/workout_sessions/{workoutSessionId}")
+    public ResponseEntity<?> deleteWorkoutSessionForUser(@PathVariable Long userId, @PathVariable Long workoutSessionId) {
+        userService.deleteWorkoutSessionForUser(userId, workoutSessionId);
+        return ResponseEntity.noContent().build();
     }
 }
