@@ -10,7 +10,4 @@ import java.util.Optional;
 @Repository
 public interface BodyReportRepository extends JpaRepository<BodyReport, Long> {
 
-    List<BodyReport> findAll();
-    Optional<BodyReport> findById(Long id);
-
 }
