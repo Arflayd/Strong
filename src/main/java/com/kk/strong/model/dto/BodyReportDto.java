@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class BodyReportDto {
 
     private Long id;
+    private Long userId;
     private LocalDateTime timestamp;
     private double weight;
     private double muscleWeight;

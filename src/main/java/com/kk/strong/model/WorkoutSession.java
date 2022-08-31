@@ -20,12 +20,19 @@ public class WorkoutSession {
     @GeneratedValue
     private Long id;
 
+    @ManyToOne
+    private User user;
+
     private LocalDateTime timestamp;
 
     @Enumerated(value = EnumType.STRING)
     private WorkoutCategory workoutCategory;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "workoutSession",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Exercise> exercises = new ArrayList<>();
 
 }

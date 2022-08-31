@@ -11,6 +11,7 @@ import java.util.List;
 public class WorkoutSessionDto {
 
     private Long id;
+    private Long userId;
     private LocalDateTime timestamp;
     private WorkoutCategory workoutCategory;
     private List<ExerciseDto> exercises = new ArrayList<>();

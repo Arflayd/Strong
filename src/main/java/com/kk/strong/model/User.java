@@ -26,9 +26,17 @@ public class User {
     private int age;
     private int height;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<BodyReport> bodyReports = new ArrayList<>();
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<WorkoutSession> workoutSessions = new ArrayList<>();
 
     @ElementCollection
