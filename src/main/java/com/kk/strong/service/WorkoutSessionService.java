@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WorkoutSessionService {
 
-    private final ExerciseService exerciseService;
     private final WorkoutSessionRepository workoutSessionRepository;
 
     private final ModelMapper modelMapper = new ModelMapper();
@@ -56,35 +55,15 @@ public class WorkoutSessionService {
     public ExerciseDto addExerciseForWorkoutSession(Long workoutSessionId, ExerciseDto exerciseDto) {
         log.info("Adding exercise for workout session with id: {}", workoutSessionId);
         Exercise exercise = modelMapper.map(exerciseDto, Exercise.class);
-        workoutSessionRepository
-                .findById(workoutSessionId)
-                .orElseThrow(() -> new WorkoutSessionNotFoundException(workoutSessionId))
-                .getExercises()
-                .add(exercise);
-        return exerciseDto;
-    }
-
-    public void deleteExerciseForWorkoutSession(Long workoutSessionId, Long exerciseId) {
-        log.info("Deleting exercise with id: {}", exerciseId);
         WorkoutSession workoutSession = workoutSessionRepository
                 .findById(workoutSessionId)
                 .orElseThrow(() -> new WorkoutSessionNotFoundException(workoutSessionId));
-        Exercise exerciseToDelete = workoutSession
-                .getExercises()
-                .stream()
-                .filter(exercise -> exercise.getId().equals(exerciseId))
-                .findFirst()
-                .orElseThrow(() -> new ExerciseNotFoundException(exerciseId));
-        workoutSession.getExercises().remove(exerciseToDelete);
-        exerciseService.deleteExercise(exerciseId);
+        workoutSession.addExercise(exercise);
+        return modelMapper.map(exercise, ExerciseDto.class);
     }
 
     public void deleteWorkoutSession(Long workoutSessionId) {
-        workoutSessionRepository
-                .findById(workoutSessionId)
-                .orElseThrow(() -> new WorkoutSessionNotFoundException(workoutSessionId))
-                .getExercises()
-                .forEach(exercise -> deleteExerciseForWorkoutSession(workoutSessionId, exercise.getId()));
+        log.info("Deleting workout session with id: {}", workoutSessionId);
         workoutSessionRepository.deleteById(workoutSessionId);
     }
 }

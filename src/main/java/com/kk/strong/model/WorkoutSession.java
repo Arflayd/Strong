@@ -35,4 +35,8 @@ public class WorkoutSession {
     )
     private List<Exercise> exercises = new ArrayList<>();
 
+    public void addExercise(Exercise exercise){
+        exercises.add(exercise);
+        exercise.setWorkoutSession(this);
+    }
 }

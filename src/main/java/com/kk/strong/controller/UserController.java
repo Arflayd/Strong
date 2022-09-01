@@ -24,6 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
+    @PreAuthorize("permitAll()")
     public ResponseEntity<UserDto> registerUser(
             @PathParam("username") String username,
             @PathParam("password") String password,
@@ -59,21 +60,9 @@ public class UserController {
                 .body(userService.addBodyReportForUser(userId, bodyReportDto));
     }
 
-    @DeleteMapping("/{userId}/body_reports/{bodyReportId}")
-    public ResponseEntity<?> deleteBodyReportForUser(@PathVariable Long userId, @PathVariable Long bodyReportId) {
-        userService.deleteBodyReportForUser(userId, bodyReportId);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/{userId}/workout_sessions")
     public ResponseEntity<WorkoutSessionDto> addWorkoutSessionForUser(@PathVariable Long userId, @RequestBody WorkoutSessionDto workoutSessionDto) {
         return ResponseEntity.created(URI.create(String.format("/users/%s/workout_sessions", userId)))
                 .body(userService.addWorkoutSessionForUser(userId, workoutSessionDto));
-    }
-
-    @DeleteMapping("/{userId}/workout_sessions/{workoutSessionId}")
-    public ResponseEntity<?> deleteWorkoutSessionForUser(@PathVariable Long userId, @PathVariable Long workoutSessionId) {
-        userService.deleteWorkoutSessionForUser(userId, workoutSessionId);
-        return ResponseEntity.noContent().build();
     }
 }

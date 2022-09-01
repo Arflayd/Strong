@@ -50,6 +50,7 @@ public class BodyReportService {
     }
 
     public void deleteBodyReport(Long bodyReportId){
+        log.info("Deleting body report with id: {}", bodyReportId);
         bodyReportRepository.deleteById(bodyReportId);
     }
 }

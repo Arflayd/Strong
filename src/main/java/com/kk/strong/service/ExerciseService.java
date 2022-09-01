@@ -51,6 +51,7 @@ public class ExerciseService {
     }
 
     public void deleteExercise(Long exerciseId){
+        log.info("Deleting exercise with id: {}", exerciseId);
         exerciseRepository.deleteById(exerciseId);
     }
 }

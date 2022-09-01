@@ -33,4 +33,10 @@ public class BodyReportController {
         bodyReportService.updateBodyReport(bodyReportId, bodyReportDto);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{bodyReportId}")
+    public ResponseEntity<?> deleteBodyReport(@PathVariable Long bodyReportId){
+        bodyReportService.deleteBodyReport(bodyReportId);
+        return ResponseEntity.noContent().build();
+    }
 }

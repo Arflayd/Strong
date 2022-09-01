@@ -37,15 +37,15 @@ public class WorkoutSessionController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{workoutSessionId}")
+    public ResponseEntity<?> deleteWorkoutSession(@PathVariable Long workoutSessionId){
+        workoutSessionService.deleteWorkoutSession(workoutSessionId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{workoutSessionId}/exercises")
     public ResponseEntity<ExerciseDto> addExerciseForWorkoutSession(@PathVariable Long workoutSessionId, @RequestBody ExerciseDto exerciseDto) {
         return ResponseEntity.created(URI.create(String.format("/workout_sessions/%s", workoutSessionId)))
                 .body(workoutSessionService.addExerciseForWorkoutSession(workoutSessionId, exerciseDto));
-    }
-
-    @DeleteMapping("/{workoutSessionId}/exercises/{exerciseId}")
-    public ResponseEntity<?> deleteExerciseForWorkoutSession(@PathVariable Long workoutSessionId, @PathVariable Long exerciseId) {
-        workoutSessionService.deleteExerciseForWorkoutSession(workoutSessionId, exerciseId);
-        return ResponseEntity.noContent().build();
     }
 }

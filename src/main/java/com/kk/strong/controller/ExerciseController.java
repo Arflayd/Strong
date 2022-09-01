@@ -34,4 +34,10 @@ public class ExerciseController {
         exerciseService.updateExercise(exerciseId, exerciseDto);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{exerciseId}")
+    public ResponseEntity<?> deleteExercise(@PathVariable Long exerciseId){
+        exerciseService.deleteExercise(exerciseId);
+        return ResponseEntity.noContent().build();
+    }
 }
