@@ -9,3 +9,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+api:
+  x-rapid-api-key:
+  meal-api-url:
