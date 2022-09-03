@@ -56,7 +56,7 @@ public class TokenAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private UsernamePasswordAuthenticationToken decodeToken (String token) {
+    private UsernamePasswordAuthenticationToken decodeToken(String token) {
 
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).build();
         DecodedJWT decodedJWT = verifier.verify(token);

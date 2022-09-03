@@ -4,7 +4,6 @@ import com.kk.strong.model.WorkoutCategory;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,5 +13,5 @@ public class WorkoutSessionDto {
     private Long userId;
     private LocalDateTime timestamp;
     private WorkoutCategory workoutCategory;
-    private List<ExerciseDto> exercises = new ArrayList<>();
+    private List<ExerciseDto> exercises;
 }

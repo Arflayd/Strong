@@ -12,14 +12,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "gym_users")
+public class GymUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String username;
-    private String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Account account;
 
     private String name;
     private GenderType gender;
@@ -27,20 +28,15 @@ public class User {
     private int height;
 
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "gymUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<BodyReport> bodyReports = new ArrayList<>();
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "gymUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<WorkoutSession> workoutSessions = new ArrayList<>();
-
-    @ElementCollection
-    @Enumerated(value = EnumType.STRING)
-    private List<UserRole> roles = new ArrayList<>();
-
 }

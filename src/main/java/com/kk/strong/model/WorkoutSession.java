@@ -21,7 +21,7 @@ public class WorkoutSession {
     private Long id;
 
     @ManyToOne
-    private User user;
+    private GymUser gymUser;
 
     private LocalDateTime timestamp;
 
