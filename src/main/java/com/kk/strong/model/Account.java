@@ -12,18 +12,17 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "accounts")
+public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String name;
     private String username;
     private String password;
 
     @ElementCollection
     @Enumerated(value = EnumType.STRING)
-    private List<UserRole> roles = new ArrayList<>();
+    private List<AccountRole> roles = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private GymUser gymUser;
 }
