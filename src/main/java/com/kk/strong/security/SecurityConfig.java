@@ -45,7 +45,7 @@ public class SecurityConfig {
         httpSecurity.csrf().disable();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        httpSecurity.authorizeRequests().antMatchers(HttpMethod.POST, "/users").permitAll();
+        httpSecurity.authorizeRequests().antMatchers(HttpMethod.POST, "/accounts").permitAll();
         httpSecurity.authorizeRequests().anyRequest().authenticated();
 
         httpSecurity.addFilter(usernamePasswordTokenAuthenticationFilter);
