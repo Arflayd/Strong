@@ -1,9 +1,8 @@
 package com.kk.strong.service;
 
-import com.kk.strong.exception.BodyReportNotFoundException;
 import com.kk.strong.exception.ExerciseNotFoundException;
-import com.kk.strong.model.BodyReport;
 import com.kk.strong.model.Exercise;
+import com.kk.strong.model.ExerciseType;
 import com.kk.strong.model.dto.ExerciseDto;
 import com.kk.strong.repository.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class ExerciseService {
 
     public ExerciseDto getExercise(Long exerciseId) {
         log.info("Getting exercise with id: {}", exerciseId);
-        Exercise exercise =  exerciseRepository
+        Exercise exercise = exerciseRepository
                 .findById(exerciseId)
                 .orElseThrow(() -> new ExerciseNotFoundException(exerciseId));
         return modelMapper.map(exercise, ExerciseDto.class);
@@ -53,5 +52,14 @@ public class ExerciseService {
     public void deleteExercise(Long exerciseId){
         log.info("Deleting exercise with id: {}", exerciseId);
         exerciseRepository.deleteById(exerciseId);
+    }
+
+    public List<ExerciseDto> getExercisesForGymUserAndExerciseType(Long gymUserId, ExerciseType exerciseType) {
+        log.info("Getting exercises of type: {}, for user with id: {}", exerciseType, gymUserId);
+        return exerciseRepository
+                .findAllByWorkoutSession_GymUser_IdAndExerciseTypeOrderByWorkoutSession_Timestamp(gymUserId, exerciseType)
+                .stream()
+                .map(exercise -> modelMapper.map(exercise, ExerciseDto.class))
+                .collect(Collectors.toList());
     }
 }

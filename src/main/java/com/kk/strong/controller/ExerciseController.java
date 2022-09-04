@@ -1,7 +1,6 @@
 package com.kk.strong.controller;
 
-import com.kk.strong.model.Exercise;
-import com.kk.strong.model.WorkoutSession;
+import com.kk.strong.model.ExerciseType;
 import com.kk.strong.model.dto.ExerciseDto;
 import com.kk.strong.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +35,13 @@ public class ExerciseController {
     }
 
     @DeleteMapping("/{exerciseId}")
-    public ResponseEntity<?> deleteExercise(@PathVariable Long exerciseId){
+    public ResponseEntity<?> deleteExercise(@PathVariable Long exerciseId) {
         exerciseService.deleteExercise(exerciseId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user_progress/{gymUserId}/{exerciseType}")
+    public ResponseEntity<List<ExerciseDto>> getExercisesForUserAndExerciseType(@PathVariable Long gymUserId, @PathVariable ExerciseType exerciseType) {
+        return ResponseEntity.ok(exerciseService.getExercisesForGymUserAndExerciseType(gymUserId, exerciseType));
     }
 }
