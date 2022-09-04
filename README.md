@@ -3,6 +3,7 @@
 
 This app is being made for practice.
 
-Using
-https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/mealplans/generate \
-to generate meal plans
+Using https://spoonacular.com/food-api to generate meal plans
+
+API key from: https://rapidapi.com <br>
+Meal plan endpoint: https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/mealplans/generate

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('PREMIUM_USER')")
-@RequestMapping("/meals")
+@PreAuthorize("hasAuthority('REGULAR_USER')")
+@RequestMapping("/meal_plans")
 public class MealPlanController {
 
     private final MealPlanService mealPlanService;
