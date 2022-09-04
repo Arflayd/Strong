@@ -39,4 +39,14 @@ public class GymUser {
             orphanRemoval = true
     )
     private List<WorkoutSession> workoutSessions = new ArrayList<>();
+
+    public void addBodyReport(BodyReport bodyReport){
+        bodyReports.add(bodyReport);
+        bodyReport.setGymUser(this);
+    }
+
+    public void addWorkoutSession(WorkoutSession workoutSession){
+        workoutSessions.add(workoutSession);
+        workoutSession.setGymUser(this);
+    }
 }

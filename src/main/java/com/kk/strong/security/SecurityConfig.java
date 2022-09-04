@@ -3,6 +3,7 @@ package com.kk.strong.security;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -44,6 +45,7 @@ public class SecurityConfig {
         httpSecurity.csrf().disable();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        httpSecurity.authorizeRequests().antMatchers(HttpMethod.POST, "/accounts").permitAll();
         httpSecurity.authorizeRequests().anyRequest().authenticated();
 
         httpSecurity.addFilter(usernamePasswordTokenAuthenticationFilter);
