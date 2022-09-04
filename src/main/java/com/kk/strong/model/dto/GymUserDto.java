@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserDto {
+public class GymUserDto {
 
     private Long id;
     private String name;
