@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 
-    List<Exercise> findAllByWorkoutSession_User_IdAndExerciseTypeOrderByWorkoutSession_Timestamp(Long userId, ExerciseType exerciseType);
+    List<Exercise> findAllByWorkoutSession_GymUser_IdAndExerciseTypeOrderByWorkoutSession_Timestamp(Long gymUserId, ExerciseType exerciseType);
 }

@@ -1,10 +1,9 @@
 package com.kk.strong.service;
 
 import com.kk.strong.exception.UserNotFoundException;
-import com.kk.strong.model.BodyReport;
-import com.kk.strong.model.GymUser;
-import com.kk.strong.model.WorkoutSession;
+import com.kk.strong.model.*;
 import com.kk.strong.model.dto.BodyReportDto;
+import com.kk.strong.model.dto.ExerciseDto;
 import com.kk.strong.model.dto.GymUserDto;
 import com.kk.strong.model.dto.WorkoutSessionDto;
 import com.kk.strong.repository.GymUserRepository;
@@ -14,7 +13,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,5 +78,45 @@ public class GymUserService {
     public void deleteUser(Long userId) {
         log.info("Deleting user with id: {}", userId);
         gymUserRepository.deleteById(userId);
+    }
+
+    public List<ExerciseDto> getLatestExercisesOfExerciseTypeForAllUsersWithSorting(ExerciseType exerciseType, RankingSortingType rankingSortingType) {
+        List<ExerciseDto> exerciseDtos = new ArrayList<>();
+        for (GymUser gymUser : gymUserRepository.findAll()) {
+            List<WorkoutSession> latestWorkoutSessions = gymUser
+                    .getWorkoutSessions()
+                    .stream()
+                    .sorted(Comparator.comparing(WorkoutSession::getTimestamp)).toList();
+            for (WorkoutSession workoutSession : latestWorkoutSessions) {
+                Optional<Exercise> latestExercise = workoutSession
+                        .getExercises()
+                        .stream()
+                        .filter(exercise -> exercise
+                                .getExerciseType()
+                                .equals(exerciseType))
+                        .findFirst();
+                if (latestExercise.isPresent()) {
+                    exerciseDtos.add(modelMapper.map(latestExercise, ExerciseDto.class));
+                    break;
+                }
+            }
+        }
+
+        exerciseDtos.sort((firstExercise, secondExercise) -> switch (rankingSortingType) {
+            case REPETITIONS -> Integer.compare(
+                    firstExercise.getRepetitions(),
+                    secondExercise.getRepetitions());
+            case SETS -> Integer.compare(
+                    firstExercise.getSets(),
+                    secondExercise.getSets());
+            case COMBINED -> Integer.compare(
+                    firstExercise.getSets() * firstExercise.getRepetitions(),
+                    secondExercise.getSets() * secondExercise.getRepetitions());
+            case WEIGHT -> Integer.compare(
+                    firstExercise.getLoadWeight(),
+                    secondExercise.getLoadWeight());
+        });
+
+        return exerciseDtos;
     }
 }

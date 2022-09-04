@@ -54,10 +54,10 @@ public class ExerciseService {
         exerciseRepository.deleteById(exerciseId);
     }
 
-    public List<ExerciseDto> getExercisesForUserAndExerciseType(Long userId, ExerciseType exerciseType) {
-        log.info("Getting exercises of type: {}, for user with id: {}", exerciseType, userId);
+    public List<ExerciseDto> getExercisesForGymUserAndExerciseType(Long gymUserId, ExerciseType exerciseType) {
+        log.info("Getting exercises of type: {}, for user with id: {}", exerciseType, gymUserId);
         return exerciseRepository
-                .findAllByWorkoutSession_User_IdAndExerciseTypeOrderByWorkoutSession_Timestamp(userId, exerciseType)
+                .findAllByWorkoutSession_GymUser_IdAndExerciseTypeOrderByWorkoutSession_Timestamp(gymUserId, exerciseType)
                 .stream()
                 .map(exercise -> modelMapper.map(exercise, ExerciseDto.class))
                 .collect(Collectors.toList());

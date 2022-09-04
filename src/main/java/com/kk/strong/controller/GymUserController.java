@@ -1,6 +1,9 @@
 package com.kk.strong.controller;
 
+import com.kk.strong.model.ExerciseType;
+import com.kk.strong.model.RankingSortingType;
 import com.kk.strong.model.dto.BodyReportDto;
+import com.kk.strong.model.dto.ExerciseDto;
 import com.kk.strong.model.dto.GymUserDto;
 import com.kk.strong.model.dto.WorkoutSessionDto;
 import com.kk.strong.service.GymUserService;
@@ -52,5 +55,10 @@ public class GymUserController {
     public ResponseEntity<WorkoutSessionDto> addWorkoutSessionForUser(@PathVariable Long gymUserId, @RequestBody WorkoutSessionDto workoutSessionDto) {
         return ResponseEntity.created(URI.create(String.format("/users/%s/workout_sessions", gymUserId)))
                 .body(gymUserService.addWorkoutSessionForUser(gymUserId, workoutSessionDto));
+    }
+
+    @GetMapping("/rankings/{exerciseType}/{rankingSortingType}")
+    public ResponseEntity<List<ExerciseDto>> getExercisesForUserAndExerciseType(@PathVariable ExerciseType exerciseType, @PathVariable RankingSortingType rankingSortingType) {
+        return ResponseEntity.ok(gymUserService.getLatestExercisesOfExerciseTypeForAllUsersWithSorting(exerciseType, rankingSortingType));
     }
 }

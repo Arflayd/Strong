@@ -40,8 +40,8 @@ public class ExerciseController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/user_progress/{userId}/{exerciseType}")
-    public ResponseEntity<List<ExerciseDto>> getExercisesForUserAndExerciseType(@PathVariable Long userId, @PathVariable ExerciseType exerciseType) {
-        return ResponseEntity.ok(exerciseService.getExercisesForUserAndExerciseType(userId, exerciseType));
+    @GetMapping("/user_progress/{gymUserId}/{exerciseType}")
+    public ResponseEntity<List<ExerciseDto>> getExercisesForUserAndExerciseType(@PathVariable Long gymUserId, @PathVariable ExerciseType exerciseType) {
+        return ResponseEntity.ok(exerciseService.getExercisesForGymUserAndExerciseType(gymUserId, exerciseType));
     }
 }
